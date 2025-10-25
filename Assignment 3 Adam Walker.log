@@ -1,0 +1,250 @@
+----------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\adamj\Downloads\Assignment 3 Adam Walker.log
+  log type:  text
+ opened on:  24 Oct 2025, 23:37:43
+
+. do "C:\Users\adamj\Downloads\Assignment 3 - Adam Walker.do"
+
+. *Assignment 3
+. 
+. *1 
+. 
+. *Adam Walker
+. *POL S 411
+. *Dr Snagovsky
+. *Oct 24 2025
+. 
+. clear all
+
+. cd "C:\Users\adamj\Downloads"
+C:\Users\adamj\Downloads
+
+. use "cses5.dta"
+
+. 
+. *2 Research 
+. 
+. * Is there a relationship between where a person places themsleves on a left-right ideology scale and how high they rate their knowled
+> ge of their country's politics. 
+. 
+. *Null: Where someone places themselves on an ideology scale is unrelated to where they rank their own political knowledge. 
+. 
+. *Alternative: People who rank themselves further to either extreme of the left-right scale will rate their political knowledge higher.
+>  Since they have stronger political opinions it is possible they have done some form of research or reasoning to come to those conclus
+> ions and feel knowledgeable. 
+. 
+. 
+. *3 Variable info
+. 
+. codebook E3003 E3020
+
+----------------------------------------------------------------------------------------------------------------------------------------
+E3003                                                                                                                  INTERNAL EFFICACY
+----------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (byte)
+                 Label: E3003
+
+                 Range: [1,9]                         Units: 1
+         Unique values: 8                         Missing .: 0/114,714
+
+            Tabulation: Freq.   Numeric  Label
+                       25,008         1  1. STRONGLY AGREE
+                       44,322         2  2. SOMEWHAT AGREE
+                       21,311         3  3. NEITHER AGREE NOR DISAGREE
+                       13,399         4  4. SOMEWHAT DISAGREE
+                        6,918         5  5. STRONGLY DISAGREE
+                          583         7  7. VOLUNTEERED: REFUSED
+                        1,598         8  8. VOLUNTEERED: DON'T KNOW
+                        1,575         9  9. MISSING
+
+----------------------------------------------------------------------------------------------------------------------------------------
+E3020                                                                                                        IDEOLOGY: LEFT-RIGHT - SELF
+----------------------------------------------------------------------------------------------------------------------------------------
+
+                  Type: Numeric (byte)
+                 Label: E3020, but 9 nonmissing values are not labeled
+
+                 Range: [0,99]                        Units: 1
+         Unique values: 15                        Missing .: 0/114,714
+
+              Examples: 3     
+                        5     
+                        7     
+                        10    10. RIGHT
+
+. describe E3003 E3020
+
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+----------------------------------------------------------------------------------------------------------------------------------------
+E3003           byte    %8.0g      E3003      INTERNAL EFFICACY
+E3020           byte    %8.0g      E3020      IDEOLOGY: LEFT-RIGHT - SELF
+
+. 
+. replace E3003 = . if E3003 > 5
+(3,756 real changes made, 3,756 to missing)
+
+. replace E3020 = . if E3020 > 10
+(22,368 real changes made, 22,368 to missing)
+
+. 
+. ssc install revrs
+checking revrs consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. revrs E3003
+
+. 
+. sum revE3003 E3020, detail
+
+                      INTERNAL EFFICACY
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            1              1
+ 5%            1              1
+10%            2              1       Obs             110,958
+25%            3              1       Sum of wgt.     110,958
+
+50%            4                      Mean            3.60476
+                        Largest       Std. dev.      1.142543
+75%            4              5
+90%            5              5       Variance       1.305404
+95%            5              5       Skewness      -.6748841
+99%            5              5       Kurtosis        2.67626
+
+                 IDEOLOGY: LEFT-RIGHT - SELF
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            1              0       Obs              92,346
+25%            3              0       Sum of wgt.      92,346
+
+50%            5                      Mean           5.215927
+                        Largest       Std. dev.      2.702556
+75%            7             10
+90%            9             10       Variance       7.303811
+95%           10             10       Skewness      -.0309608
+99%           10             10       Kurtosis       2.371012
+
+. 
+. *revE3003 Internal Efficacy -- Mean: 3.60, Median: 4, Min: 1, Max: 5, SD: 1.14, Skew: -0.67
+. 
+. *E3020 Ideology Self -- Mean: 5.22, Median: 5, Min: 0, Max: 10, SD: 2.70, Skew: -0.03 
+. 
+. 
+. ssc install blindschemes
+checking blindschemes consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. set scheme plottig
+
+. 
+. 
+. *4 Dependent Var Graph
+. graph bar, over(revE3003, label(labsize(1.55))) b1title("I understand the most important political events of my country.") ytitle(Perc
+> entage of Respondents, size(medium)) name(Four) title(Self Ranking of Politcal Knowledge)
+
+. 
+. graph save "Four" "C:\Users\adamj\Downloads\Four.pdf"
+file C:\Users\adamj\Downloads\Four.pdf saved as .gph format
+
+. 
+. 
+. *5 Idependent Var Graph
+. graph bar, over(E3020) b1title(Ideology) ytitle(Percentage of Respondents, size(medium)) name(Five) title(Self Ranked Ideology)
+
+. 
+. graph save "Five" "C:\Users\adamj\Downloads\Five.pdf"
+file C:\Users\adamj\Downloads\Five.pdf saved as .gph format
+
+. 
+. 
+. *6 Grouped Graph
+. label define knowledge_labels 1 "Very Low Knowledge" 2 "Low Knowledge" 3 "Moderate Knowledge" 4 "High Knowledge" 5 "Very High Knowledg
+> e"
+
+. label values revE3003 knowledge_labels
+
+. 
+. graph hbar (percent), over(revE3003, label(labsize(1))) over(E3020) title(Self Ranked Knowledge grouped by Ideology Rank) ytitle(Perce
+> ntage of Total Respondents) name(Six)
+
+. 
+. graph save "Six" "C:\Users\adamj\Downloads\Six.pdf"
+file C:\Users\adamj\Downloads\Six.pdf saved as .gph format
+
+. 
+. 
+. *7 Correlation matrix
+. pwcorr revE3003 E3020, sig
+
+             | revE3003    E3020
+-------------+------------------
+    revE3003 |   1.0000 
+             |
+             |
+       E3020 |  -0.0396   1.0000 
+             |   0.0000
+             |
+
+. 
+. *The p value is 0.000 so we know that the correlation is statistically significant. The r value is -0.039 which indicates a very weak 
+> negative correlation. As one value (either political knowledge or how far right one is) increases the other value, on average will dec
+> rease just slightly. For example as someone moves further right ideologically they should report slightly lower levels of political kn
+> owledge. While being statistically significant the correlation is so weak that it is nearly negligible. 
+. 
+. 
+. 
+. *8 Regression
+. regress revE3003 E3020
+
+      Source |       SS           df       MS      Number of obs   =    90,397
+-------------+----------------------------------   F(1, 90395)     =    141.69
+       Model |   167.46653         1   167.46653   Prob > F        =    0.0000
+    Residual |  106837.436    90,395  1.18189541   R-squared       =    0.0016
+-------------+----------------------------------   Adj R-squared   =    0.0016
+       Total |  107004.902    90,396  1.18373493   Root MSE        =    1.0872
+
+------------------------------------------------------------------------------
+    revE3003 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       E3020 |  -.0160003   .0013442   -11.90   0.000    -.0186348   -.0133657
+       _cons |   3.772964   .0078757   479.06   0.000     3.757528      3.7884
+------------------------------------------------------------------------------
+
+. 
+. *The relationship is statistically significant as the p value is 0.000. As with the previous test while being statistically significan
+> t the correlation is tiny at -0.016. Looking at the r^2 value and we can see that the model accounted for less than 1% of the variance
+>  in the dependent variable. The model is not very accurate at all, there could possibly be a non-linear correlation or something else 
+> at play. 
+. 
+. 
+. 
+. *9 Analysis
+. *  While there is a statistically significant but very weak correlation the model is so inaccurate that I must fail to reject the null
+>  hypothesis for now. My alternative hypothesis would likely be a non linear model, more of a v or u shape with either side cancelling 
+> out and giving me the rather flat slope value of -0.016, but this is only speculation based on intuition and the grouped bar graph. I 
+> have not done futher testing to determine if that is true or not so I must fail to reject the null hypothesis. 
+. 
+. 
+. *10 Function Line
+. 
+. twoway function y=-0.016*x+3.773, range(0 10) xlab(0(1)10) ylab(1(1)5) xtitle(Ideology) ytitle(Political Knowledge) title(y=-0.016*x+3
+> .773) name(Ten)
+
+. 
+. graph save "Ten" "C:\Users\adamj\Downloads\Ten.pdf"
+file C:\Users\adamj\Downloads\Ten.pdf saved as .gph format
+
+. 
+end of do-file
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\adamj\Downloads\Assignment 3 Adam Walker.log
+  log type:  text
+ closed on:  24 Oct 2025, 23:38:33
+----------------------------------------------------------------------------------------------------------------------------------------
